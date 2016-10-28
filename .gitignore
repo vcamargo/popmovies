@@ -1,5 +1,11 @@
+*.iml
 .gradle
-build/
+/local.properties
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.idea/
 
 # Ignore Gradle GUI config
 gradle-app.setting
