@@ -15,4 +15,6 @@ A plot synopsis (called overview in the api)
 user rating (called vote_average in the api)
 release date
 
+Please update MovieDbApiKey with your key on gradle.properties
+
 
