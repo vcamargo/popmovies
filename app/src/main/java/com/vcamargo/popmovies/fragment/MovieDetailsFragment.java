@@ -32,7 +32,7 @@ public class MovieDetailsFragment extends Fragment {
 
         Intent intent = getActivity().getIntent();
         if (intent != null) {
-            movieBean = (MovieBean) intent.getSerializableExtra(MovieBean.INTENT_EXTRA_KEY);
+            movieBean = intent.getParcelableExtra(MovieBean.INTENT_EXTRA_KEY);
         }
         if (movieBean != null) {
             ((TextView)rootView.findViewById(R.id.original_title)).setText(movieBean.getOriginalTitle());
@@ -41,7 +41,7 @@ public class MovieDetailsFragment extends Fragment {
             ((TextView)rootView.findViewById(R.id.release_date)).setText(movieBean.getFormattedReleaseYear());
             Picasso
                     .with(getActivity())
-                    .load(movieBean.getImgPosterId())
+                    .load(movieBean.getFullURLgetImgPosterId())
                     .fit()
                     .into(((ImageView)rootView.findViewById(R.id.img_thumb)));
         }

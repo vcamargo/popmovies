@@ -1,12 +1,13 @@
 package com.vcamargo.popmovies.bean;
 
-import java.io.Serializable;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * Created by vinicius.camargo on 25/10/2016.
  */
 
-public class MovieBean implements Serializable {
+public class MovieBean implements Parcelable {
     public static final String BASE_URL = "http://image.tmdb.org/t/p/w185/";
     public static final String INTENT_EXTRA_KEY = "MovieBean";
     private static final String AVERAGE_VOTE_SUFFIX = "/10";
@@ -16,6 +17,19 @@ public class MovieBean implements Serializable {
     private String overview; //overview
     private String voteAverage; //vote_average
     private String releaseDate; //release_date
+
+
+    public static final Creator<MovieBean> CREATOR = new Creator<MovieBean>() {
+        @Override
+        public MovieBean createFromParcel(Parcel in) {
+            return new MovieBean(in);
+        }
+
+        @Override
+        public MovieBean[] newArray(int size) {
+            return new MovieBean[size];
+        }
+    };
 
     public MovieBean(String imgPosterId, String imgThumbId, String originalTitle, String overview, String voteAverage, String releaseDate) {
         this.imgPosterId = imgPosterId;
@@ -44,6 +58,10 @@ public class MovieBean implements Serializable {
     }
 
     public String getImgPosterId() {
+        return imgPosterId;
+    }
+
+    public String getFullURLgetImgPosterId() {
         return BASE_URL + imgPosterId;
     }
 
@@ -89,5 +107,29 @@ public class MovieBean implements Serializable {
 
     public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(getImgPosterId());
+        parcel.writeString(getImgThumbId());
+        parcel.writeString(getOriginalTitle());
+        parcel.writeString(getOverview());
+        parcel.writeString(getVoteAverage());
+        parcel.writeString(getReleaseDate());
+    }
+
+    private MovieBean(Parcel in) {
+        setImgPosterId(in.readString());
+        setImgThumbId(in.readString());
+        setOriginalTitle(in.readString());
+        setOverview(in.readString());
+        setVoteAverage(in.readString());
+        setReleaseDate(in.readString());
     }
 }

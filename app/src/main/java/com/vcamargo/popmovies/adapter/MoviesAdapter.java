@@ -29,16 +29,26 @@ public class MoviesAdapter extends ArrayAdapter<MovieBean> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         MovieBean movieBean = getItem(position);
-
+        ViewHolder holder;
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.grid_item_movie, parent, false);
+            holder = new ViewHolder();
+            holder.imageView = (ImageView) convertView.findViewById(R.id.grid_movie_image);
+            convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
         }
 
-        ImageView imageView = (ImageView) convertView.findViewById(R.id.grid_movie_image);
         Picasso
                 .with(mContext)
-                .load(movieBean.getImgPosterId())
-                .into(imageView);
+                .load(movieBean.getFullURLgetImgPosterId())
+                .into(holder.imageView);
         return convertView;
     }
+
+    static class ViewHolder {
+        ImageView imageView;
+    }
 }
+
+

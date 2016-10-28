@@ -9,4 +9,7 @@
     <string name="pref_sort_label_mostpopular">Most Popular</string>
     <string name="pref_sort_label_toprated">Top Rated</string>
     <string name="title_activity_movie_details">MovieDetail</string>
+    <string name="snack_no_network_error">No internet connection available. Please check your internet connection and try again!</string>
+    <string name="toast_no_api_response_error">Something went wrong, please check your internet connection and try again!</string>
+
 </resources>

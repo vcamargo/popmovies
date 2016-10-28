@@ -49,7 +49,7 @@
         <TextView
             android:id="@+id/movie_synopsis"
             android:layout_width="match_parent"
-            android:layout_height="70dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/img_thumb"
@@ -60,11 +60,13 @@
         <TextView
             android:id="@+id/original_title"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_above="@+id/img_thumb"
-            android:layout_alignLeft="@+id/img_thumb"
-            android:layout_alignStart="@+id/img_thumb"
+            android:layout_height="wrap_content"
             android:textColor="@android:color/white"
-            android:textSize="30dp" />
+            android:textSize="30dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="25dp"
+            android:layout_marginLeft="20dp"/>
     </RelativeLayout>
 </ScrollView>

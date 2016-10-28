@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.vcamargo.popmovies.BuildConfig;
 import com.vcamargo.popmovies.MovieDetailsActivity;
@@ -90,6 +92,8 @@ public class MoviesGridFragment extends Fragment implements AdapterView.OnItemCl
                     getString(R.string.pref_sort_key),
                     getString(R.string.pref_sort_mostpopular));
             asynTask.execute(queryType);
+        } else {
+            Snackbar.make(getView(),R.string.snack_no_network_error,Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -180,6 +184,8 @@ public class MoviesGridFragment extends Fragment implements AdapterView.OnItemCl
                 movieAdapter.clear();
                 movieAdapter.addAll(movieBeen);
                 movieAdapter.notifyDataSetChanged();
+            } else {
+                Toast.makeText(getActivity(),R.string.toast_no_api_response_error, Toast.LENGTH_LONG).show();
             }
         }
 
