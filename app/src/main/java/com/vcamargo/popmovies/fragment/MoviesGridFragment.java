@@ -12,12 +12,13 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.Toast;
 
 import com.vcamargo.popmovies.BuildConfig;
@@ -37,8 +38,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MoviesGridFragment extends Fragment implements AdapterView.OnItemClickListener{
+    private RecyclerView mRecyclerView;
+    private RecyclerView.LayoutManager mLayoutManager;
     private MoviesAdapter movieAdapter;
     private int currentPage = 1;
 
@@ -62,11 +66,15 @@ public class MoviesGridFragment extends Fragment implements AdapterView.OnItemCl
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView =  inflater.inflate(R.layout.fragment_movie_grid, container, false);
-        movieAdapter = new MoviesAdapter(getActivity(), new ArrayList<MovieBean>());
 
-        GridView gridview = (GridView) rootView.findViewById(R.id.movies_grid);
-        gridview.setAdapter(movieAdapter);
-        gridview.setOnItemClickListener(this);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.movies_grid);
+        mRecyclerView.setHasFixedSize(true);
+
+        mLayoutManager = new GridLayoutManager(getContext(),2);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        movieAdapter = new MoviesAdapter(getActivity(),new ArrayList<MovieBean>());
+        mRecyclerView.setAdapter(movieAdapter);
         return rootView;
     }
 
@@ -182,7 +190,7 @@ public class MoviesGridFragment extends Fragment implements AdapterView.OnItemCl
         protected void onPostExecute(MovieBean[] movieBeen) {
             if (movieBeen != null) {
                 movieAdapter.clear();
-                movieAdapter.addAll(movieBeen);
+                movieAdapter.addAll(new ArrayList<>(Arrays.asList(movieBeen)));
                 movieAdapter.notifyDataSetChanged();
             } else {
                 Toast.makeText(getActivity(),R.string.toast_no_api_response_error, Toast.LENGTH_LONG).show();
