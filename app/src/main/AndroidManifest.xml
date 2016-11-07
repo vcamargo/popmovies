@@ -34,6 +34,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vcamargo.popmovies.MainActivity" />
         </activity>
+        <provider
+            android:name=".data.MoviesProvider"
+            android:authorities="com.vcamargo.popmovies"
+            android:exported="false"
+            android:syncable="true"/>
     </application>
 
 </manifest>
