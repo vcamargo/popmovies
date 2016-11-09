@@ -1,8 +1,10 @@
 package com.vcamargo.popmovies.fragment;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -12,20 +14,21 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Toast;
+import android.widget.GridView;
 
 import com.vcamargo.popmovies.BuildConfig;
 import com.vcamargo.popmovies.MovieDetailsActivity;
 import com.vcamargo.popmovies.R;
 import com.vcamargo.popmovies.adapter.MoviesAdapter;
-import com.vcamargo.popmovies.bean.MovieBean;
+import com.vcamargo.popmovies.data.MoviesContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,29 +40,34 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Vector;
 
-public class MoviesGridFragment extends Fragment implements AdapterView.OnItemClickListener{
-    private RecyclerView mRecyclerView;
-    private RecyclerView.LayoutManager mLayoutManager;
+public class MoviesGridFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener {
     private MoviesAdapter movieAdapter;
     private int currentPage = 1;
+    private static final String SELECTED_KEY = "selected_position";
+    private static final int MOVIES_LOADER = 0;
 
-    public MoviesGridFragment() {
+    //projection columns
+    private static final String[] MOVIES_COLUMNS = {
+            MoviesContract.MovieEntry.TABLE_NAME + "." + MoviesContract.MovieEntry._ID,
+            MoviesContract.MovieEntry.COLUMN_MOVIE_IMG_PATH
+    };
+    public static final int COL_MOVIE_ID = 0;
+    public static final int COL_MOVIE_IMG_PATH = 1;
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(MOVIES_LOADER, null, this);
     }
+
+    public MoviesGridFragment() {}
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Intent intent = new Intent(getActivity(), MovieDetailsActivity.class)
-                .putExtra(MovieBean.INTENT_EXTRA_KEY, movieAdapter.getItem(i));
-        startActivity(intent);
+        updateMovies();
     }
 
     @Override
@@ -67,21 +75,12 @@ public class MoviesGridFragment extends Fragment implements AdapterView.OnItemCl
                              Bundle savedInstanceState) {
         View rootView =  inflater.inflate(R.layout.fragment_movie_grid, container, false);
 
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.movies_grid);
-        mRecyclerView.setHasFixedSize(true);
+        movieAdapter = new MoviesAdapter(getActivity(),null,0);
 
-        mLayoutManager = new GridLayoutManager(getContext(),2);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
-        movieAdapter = new MoviesAdapter(getActivity(),new ArrayList<MovieBean>());
-        mRecyclerView.setAdapter(movieAdapter);
+        GridView gridview = (GridView) rootView.findViewById(R.id.movies_grid);
+        gridview.setAdapter(movieAdapter);
+        gridview.setOnItemClickListener(this);
         return rootView;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        updateMovies();
     }
 
     private boolean isNetworkAvailable() {
@@ -100,25 +99,56 @@ public class MoviesGridFragment extends Fragment implements AdapterView.OnItemCl
                     getString(R.string.pref_sort_key),
                     getString(R.string.pref_sort_mostpopular));
             asynTask.execute(queryType);
+            getLoaderManager().restartLoader(MOVIES_LOADER, null, this);
         } else {
             Snackbar.make(getView(),R.string.snack_no_network_error,Snackbar.LENGTH_LONG).show();
         }
     }
 
-    public class GetMoviesTask extends AsyncTask<String, Void, MovieBean[]> {
-        private final String LOG_TAG = GetMoviesTask.class.getSimpleName();
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+       return new CursorLoader(getActivity(),
+                MoviesContract.MovieEntry.CONTENT_URI,
+                MOVIES_COLUMNS,
+                null,
+                null,
+                null);
+    }
 
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        movieAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        movieAdapter.swapCursor(null);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
+        if (cursor != null) {
+            Intent intent = new Intent(getActivity(), MovieDetailsActivity.class)
+                    .putExtra(MoviesContract.MovieEntry._ID, cursor.getInt(COL_MOVIE_ID));
+            startActivity(intent);
+        }
+    }
+
+    public class GetMoviesTask extends AsyncTask<String, Void, Void> {
+        private final String LOG_TAG = GetMoviesTask.class.getSimpleName();
+        private String mListType;
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
         }
 
         @Override
-        protected MovieBean[] doInBackground(String... strings) {
+        protected Void doInBackground(String... strings) {
             if (strings.length == 0) {
                 return null;
             }
-
+            mListType = strings[0];
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             String moviesJsonStr = null;
@@ -127,7 +157,7 @@ public class MoviesGridFragment extends Fragment implements AdapterView.OnItemCl
 
             try {
             final String MOVIES_BASE_URL =
-                    "https://api.themoviedb.org/3/movie/" + strings[0] + "?";
+                    "https://api.themoviedb.org/3/movie/" + mListType + "?";
             final String API_KEY_PARAM = "api_key";
             final String LANGUAGE_PARAM = "language";
             final String PAGE_PARAM = "page";
@@ -178,7 +208,8 @@ public class MoviesGridFragment extends Fragment implements AdapterView.OnItemCl
                 }
             }
             try {
-                return getMoviesDataFromJson(moviesJsonStr);
+                getMoviesDataFromJson(moviesJsonStr);
+                return null;
             } catch (JSONException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
@@ -186,40 +217,57 @@ public class MoviesGridFragment extends Fragment implements AdapterView.OnItemCl
             return null;
         }
 
-        @Override
-        protected void onPostExecute(MovieBean[] movieBeen) {
-            if (movieBeen != null) {
-                movieAdapter.clear();
-                movieAdapter.addAll(new ArrayList<>(Arrays.asList(movieBeen)));
-                movieAdapter.notifyDataSetChanged();
-            } else {
-                Toast.makeText(getActivity(),R.string.toast_no_api_response_error, Toast.LENGTH_LONG).show();
-            }
-        }
-
-        private MovieBean[] getMoviesDataFromJson(String moviesJsonStr) throws JSONException {
+        private void getMoviesDataFromJson(String moviesJsonStr) throws JSONException {
             final String MOVIES_LIST = "results";
             final String IMG_POSTER_PATH = "poster_path";
-            final String IMG_THUMB_ID = "backdrop_path";
             final String ORIGINAL_TITLE = "original_title";
             final String OVERVIEW = "overview";
             final String VOTE_AVERAGE = "vote_average";
             final String RELEASE_DATE = "release_date";
+            final String MOVIE_ID = "id";
 
             JSONObject moviesJson = new JSONObject(moviesJsonStr);
             JSONArray moviesArray = moviesJson.getJSONArray(MOVIES_LIST);
+            Vector<ContentValues> cVVector = new Vector<>(moviesArray.length());
 
-            MovieBean[] moviesArrayList = new MovieBean[20];
             for(int i = 0; i < moviesArray.length(); i++) {
-                JSONObject moviesDetails = moviesArray.getJSONObject(i);
-                MovieBean movieBean = new MovieBean(moviesDetails.getString(IMG_POSTER_PATH),
-                        moviesDetails.getString(IMG_THUMB_ID),moviesDetails.getString(ORIGINAL_TITLE),
-                        moviesDetails.getString(OVERVIEW),moviesDetails.getString(VOTE_AVERAGE),
-                        moviesDetails.getString(RELEASE_DATE));
+                String movieId;
+                String movieTitleShort;
+                String movieDescription;
+                String movieReleaseDate;
+                String movieVoteAvg;
+                String movieImgPath;
 
-                moviesArrayList[i] = movieBean;
+                JSONObject moviesDetails = moviesArray.getJSONObject(i);
+                movieId = moviesDetails.getString(MOVIE_ID);
+                movieTitleShort = moviesDetails.getString(ORIGINAL_TITLE);
+                movieDescription = moviesDetails.getString(OVERVIEW);
+                movieReleaseDate = moviesDetails.getString(RELEASE_DATE);
+                movieVoteAvg = moviesDetails.getString(VOTE_AVERAGE);
+                movieImgPath = moviesDetails.getString(IMG_POSTER_PATH);
+
+                ContentValues movieValues = new ContentValues();
+                movieValues.put(MoviesContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
+                movieValues.put(MoviesContract.MovieEntry.COLUMN_MOVIE_TITLE_SHORT, movieTitleShort);
+                movieValues.put(MoviesContract.MovieEntry.COLUMN_MOVIE_DESCRIPTION, movieDescription);
+                movieValues.put(MoviesContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE, movieReleaseDate);
+                movieValues.put(MoviesContract.MovieEntry.COLUMN_MOVIE_VOTE_AVG, movieVoteAvg);
+                movieValues.put(MoviesContract.MovieEntry.COLUMN_MOVIE_IMG_PATH, movieImgPath);
+                movieValues.put(MoviesContract.MovieEntry.COLUMN_MOVIE_LIST_TYPE, mListType);
+                movieValues.put(MoviesContract.MovieEntry.COLUMN_MOVIE_IS_FAVORITE, false);
+
+                cVVector.add(movieValues);
             }
-            return moviesArrayList;
+
+            // add to database
+            if (cVVector.size() > 0) {
+                ContentValues[] cvArray = new ContentValues[cVVector.size()];
+                cVVector.toArray(cvArray);
+                getContext().getContentResolver().delete(MoviesContract.MovieEntry.CONTENT_URI, null, null);
+                getContext().getContentResolver().bulkInsert(MoviesContract.MovieEntry.CONTENT_URI, cvArray);
+            }
+
+            Log.d(LOG_TAG, "Sync Complete. " + cVVector.size() + " Inserted");
         }
     }
 }

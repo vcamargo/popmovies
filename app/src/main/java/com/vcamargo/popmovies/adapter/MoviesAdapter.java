@@ -1,7 +1,8 @@
 package com.vcamargo.popmovies.adapter;
 
-import android.app.Activity;
-import android.support.v7.widget.RecyclerView;
+import android.content.Context;
+import android.database.Cursor;
+import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,70 +11,45 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 import com.vcamargo.popmovies.R;
 import com.vcamargo.popmovies.bean.MovieBean;
-
-import java.util.List;
+import com.vcamargo.popmovies.fragment.MoviesGridFragment;
 
 /**
  * Created by vinicius.camargo on 26/10/2016.
  */
 
-public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder> {
-    private Activity mContext;
-    private List<MovieBean> movieBeanList;
-    private MovieBean movieBean;
+public class MoviesAdapter extends CursorAdapter {
 
     @Override
-    public MoviesAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View v = LayoutInflater.from(mContext)
                 .inflate(R.layout.grid_item_movie, parent, false);
         MoviesAdapter.ViewHolder vh = new MoviesAdapter.ViewHolder(v);
-        return vh;
+        v.setTag(vh);
+        return v;
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        movieBean = getItem(position);
+    public void bindView(View view, Context context, Cursor cursor) {
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
+        String imageUrl = cursor.getString(MoviesGridFragment.COL_MOVIE_IMG_PATH);
+        imageUrl = MovieBean.BASE_URL + imageUrl;
+
         Picasso
                 .with(mContext)
-                .load(movieBean.getFullURLgetImgPosterId())
-                .into(holder.imageView);
+                .load(imageUrl)
+                .into(viewHolder.imageView);
     }
 
-    @Override
-    public int getItemCount() {
-        return movieBeanList.size();
-    }
-
-    public MovieBean getItem(int position) {
-        return movieBeanList.get(position);
-    }
-
-    public void addAll(List<MovieBean> items){
-        movieBeanList.addAll(items);
-    }
-
-    public void clear(){
-        movieBeanList.clear();
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        // each data item is just a string in this case
+    public static class ViewHolder  {
         public ImageView imageView;
         public ViewHolder(View itemView) {
-            super(itemView);
-            itemView.setOnClickListener(this);
             imageView = (ImageView) itemView.findViewById(R.id.grid_movie_image);
         }
 
-        @Override
-        public void onClick(View view) {
-
-        }
     }
 
-    public MoviesAdapter(Activity mContext, List<MovieBean> movieBeanList) {
-        this.mContext = mContext;
-        this.movieBeanList = movieBeanList;
+    public MoviesAdapter(Context context, Cursor c, int flags) {
+        super(context, c, flags);
     }
 }
 

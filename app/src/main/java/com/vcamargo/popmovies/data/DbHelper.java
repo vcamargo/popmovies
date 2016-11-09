@@ -21,33 +21,38 @@ public class DbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         final String SQL_CREATE_MOVIES_TABLE = "CREATE TABLE " + MovieEntry.TABLE_NAME + " (" +
-                MovieEntry.COLUMN_MOVIE_ID + " INTEGER PRIMARY KEY," +
+                MovieEntry._ID + " INTEGER PRIMARY KEY," +
+                MovieEntry.COLUMN_MOVIE_ID + " TEXT NOT NULL," +
                 MovieEntry.COLUMN_MOVIE_TITLE_SHORT + " TEXT NOT NULL," +
                 MovieEntry.COLUMN_MOVIE_DESCRIPTION + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_MOVIE_RELEASE_DATE + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_MOVIE_VOTE_AVG + " REAL NOT NULL, " +
-                MovieEntry.COLUMN_MOVIE_IMG_PATH + " TEXT NOT NULL " +
+                MovieEntry.COLUMN_MOVIE_IMG_PATH + " TEXT NOT NULL, " +
+                MovieEntry.COLUMN_MOVIE_LIST_TYPE + " TEXT NOT NULL, " +
+                MovieEntry.COLUMN_MOVIE_IS_FAVORITE + " BOOLEAN NOT NULL " +
                 " );";
 
         final String SQL_CREATE_VIDEOS_TABLE = "CREATE TABLE " + VideoEntry.TABLE_NAME + " (" +
-                VideoEntry.COLUMN_VIDEO_ID + " INTEGER PRIMARY KEY," +
+                VideoEntry._ID + " INTEGER PRIMARY KEY," +
+                VideoEntry.COLUMN_VIDEO_ID + " TEXT NOT NULL," +
                 VideoEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL," +
                 VideoEntry.COLUMN_VIDEO_NAME + " TEXT NOT NULL, " +
                 VideoEntry.COLUMN_VIDEO_URL + " TEXT NOT NULL, " +
 
                 " FOREIGN KEY (" + VideoEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +
-                MovieEntry.TABLE_NAME + " (" + MovieEntry.COLUMN_MOVIE_ID + ") " +
+                MovieEntry.TABLE_NAME + " (" + MovieEntry._ID + ") " +
                 " );";
 
         final String SQL_CREATE_REVIEWS_TABLE = "CREATE TABLE " + ReviewEntry.TABLE_NAME + " (" +
-                ReviewEntry.COLUMN_REVIEW_ID + " INTEGER PRIMARY KEY," +
+                ReviewEntry._ID + " INTEGER PRIMARY KEY," +
+                ReviewEntry.COLUMN_REVIEW_ID + " TEXT NOT NULL," +
                 ReviewEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL," +
                 ReviewEntry.COLUMN_REVIEW_AUTHOR + " TEXT NOT NULL, " +
                 ReviewEntry.COLUMN_REVIEW_CONTENT + " TEXT NOT NULL, " +
                 ReviewEntry.COLUMN_REVIEW_URL + " TEXT NOT NULL , " +
 
-                " FOREIGN KEY (" + VideoEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +
-                MovieEntry.TABLE_NAME + " (" + MovieEntry.COLUMN_MOVIE_ID + ") " +
+                " FOREIGN KEY (" + ReviewEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +
+                MovieEntry.TABLE_NAME + " (" + MovieEntry._ID + ") " +
                 " );";
 
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIES_TABLE);

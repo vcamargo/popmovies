@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.vcamargo.popmovies.data.MoviesContract;
 import com.vcamargo.popmovies.fragment.MovieDetailsFragment;
 
 public class MovieDetailsActivity extends AppCompatActivity {
@@ -20,8 +21,15 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         // attach to view new instance of MoviesGridFragment
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().add(R.id.container_details_activity, new MovieDetailsFragment()).commit();
+            Bundle arguments = new Bundle();
+            arguments.putInt(MoviesContract.MovieEntry._ID, getIntent().getExtras().getInt(MoviesContract.MovieEntry._ID));
+
+            MovieDetailsFragment fragment = new MovieDetailsFragment();
+            fragment.setArguments(arguments);
+
+            getSupportFragmentManager().beginTransaction().add(R.id.container_details_activity, fragment).commit();
         }
+
     }
 
     @Override

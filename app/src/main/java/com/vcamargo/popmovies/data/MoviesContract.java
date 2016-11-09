@@ -24,6 +24,8 @@ public class MoviesContract {
         public static final String COLUMN_MOVIE_RELEASE_DATE = "release_date";
         public static final String COLUMN_MOVIE_VOTE_AVG = "vote_avg";
         public static final String COLUMN_MOVIE_IMG_PATH = "img_path";
+        public static final String COLUMN_MOVIE_LIST_TYPE = "list_type";
+        public static final String COLUMN_MOVIE_IS_FAVORITE = "favorite";
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE).build();
@@ -78,6 +80,11 @@ public class MoviesContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }
+
+    //movies._id = ?
+    private static final String sMoviesIdSelection =
+            MovieEntry.TABLE_NAME +
+                    "." + MovieEntry._ID + " = ? ";
 
 /**
  *                TABLES DEFINITION
