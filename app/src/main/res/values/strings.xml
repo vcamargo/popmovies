@@ -11,5 +11,8 @@
     <string name="title_activity_movie_details">MovieDetail</string>
     <string name="snack_no_network_error">No internet connection available. Please check your internet connection and try again!</string>
     <string name="toast_no_api_response_error">Something went wrong, please check your internet connection and try again!</string>
-
+    <string name="favorites_add">Mark as favorite</string>
+    <string name="favorites_remove">Remove from favorites</string>
+    <string name="sync_account_type">popmovies.vcamargo.com</string>
+    <string name="content_authority">com.vcamargo.popmovies</string>
 </resources>

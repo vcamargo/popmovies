@@ -23,21 +23,22 @@ public class DbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_MOVIES_TABLE = "CREATE TABLE " + MovieEntry.TABLE_NAME + " (" +
                 MovieEntry._ID + " INTEGER PRIMARY KEY," +
                 MovieEntry.COLUMN_MOVIE_ID + " TEXT NOT NULL," +
-                MovieEntry.COLUMN_MOVIE_TITLE_SHORT + " TEXT NOT NULL," +
-                MovieEntry.COLUMN_MOVIE_DESCRIPTION + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_MOVIE_RELEASE_DATE + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_MOVIE_VOTE_AVG + " REAL NOT NULL, " +
-                MovieEntry.COLUMN_MOVIE_IMG_PATH + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_MOVIE_LIST_TYPE + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_MOVIE_IS_FAVORITE + " BOOLEAN NOT NULL " +
+                MovieEntry.COLUMN_MOVIE_TITLE_SHORT + " TEXT," +
+                MovieEntry.COLUMN_MOVIE_DESCRIPTION + " TEXT, " +
+                MovieEntry.COLUMN_MOVIE_RELEASE_DATE + " TEXT, " +
+                MovieEntry.COLUMN_MOVIE_VOTE_AVG + " REAL, " +
+                MovieEntry.COLUMN_MOVIE_IMG_PATH + " TEXT, " +
+                MovieEntry.COLUMN_MOVIE_LIST_TYPE + " TEXT, " +
+                MovieEntry.COLUMN_MOVIE_IS_FAVORITE + " BOOLEAN, " +
+                MovieEntry.COLUMN_MOVIE_DURATION + " TEXT " +
                 " );";
 
         final String SQL_CREATE_VIDEOS_TABLE = "CREATE TABLE " + VideoEntry.TABLE_NAME + " (" +
                 VideoEntry._ID + " INTEGER PRIMARY KEY," +
                 VideoEntry.COLUMN_VIDEO_ID + " TEXT NOT NULL," +
-                VideoEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL," +
-                VideoEntry.COLUMN_VIDEO_NAME + " TEXT NOT NULL, " +
-                VideoEntry.COLUMN_VIDEO_URL + " TEXT NOT NULL, " +
+                VideoEntry.COLUMN_MOVIE_KEY + " INTEGER," +
+                VideoEntry.COLUMN_VIDEO_NAME + " TEXT, " +
+                VideoEntry.COLUMN_VIDEO_URL + " TEXT, " +
 
                 " FOREIGN KEY (" + VideoEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +
                 MovieEntry.TABLE_NAME + " (" + MovieEntry._ID + ") " +
@@ -46,10 +47,10 @@ public class DbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_REVIEWS_TABLE = "CREATE TABLE " + ReviewEntry.TABLE_NAME + " (" +
                 ReviewEntry._ID + " INTEGER PRIMARY KEY," +
                 ReviewEntry.COLUMN_REVIEW_ID + " TEXT NOT NULL," +
-                ReviewEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL," +
-                ReviewEntry.COLUMN_REVIEW_AUTHOR + " TEXT NOT NULL, " +
-                ReviewEntry.COLUMN_REVIEW_CONTENT + " TEXT NOT NULL, " +
-                ReviewEntry.COLUMN_REVIEW_URL + " TEXT NOT NULL , " +
+                ReviewEntry.COLUMN_MOVIE_KEY + " INTEGER," +
+                ReviewEntry.COLUMN_REVIEW_AUTHOR + " TEXT, " +
+                ReviewEntry.COLUMN_REVIEW_CONTENT + " TEXT, " +
+                ReviewEntry.COLUMN_REVIEW_URL + " TEXT, " +
 
                 " FOREIGN KEY (" + ReviewEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +
                 MovieEntry.TABLE_NAME + " (" + MovieEntry._ID + ") " +

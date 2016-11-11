@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.vcamargo.popmovies.fragment.MoviesGridFragment;
+import com.vcamargo.popmovies.sync.MoviesSyncAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().add(R.id.container, new MoviesGridFragment()).commit();
         }
+
+        MoviesSyncAdapter.initializeSyncAdapter(this);
     }
 
     @Override

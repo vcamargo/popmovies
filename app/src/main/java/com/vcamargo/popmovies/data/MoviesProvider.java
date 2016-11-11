@@ -2,11 +2,21 @@ package com.vcamargo.popmovies.data;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
+
+import static com.vcamargo.popmovies.fragment.MovieDetailsFragment.COL_MOVIE_DESCRIPTION;
+import static com.vcamargo.popmovies.fragment.MovieDetailsFragment.COL_MOVIE_DURATION;
+import static com.vcamargo.popmovies.fragment.MovieDetailsFragment.COL_MOVIE_RELEASE_DATE;
+import static com.vcamargo.popmovies.fragment.MovieDetailsFragment.COL_MOVIE_TITLE_SHORT;
+import static com.vcamargo.popmovies.fragment.MovieDetailsFragment.COL_MOVIE_VOTE_AVG;
+import static com.vcamargo.popmovies.fragment.MovieDetailsFragment.MOVIES_COLUMNS;
+import static com.vcamargo.popmovies.fragment.MovieDetailsFragment.mSelectionClause;
 
 /**
  * Created by vinicius.camargo on 07/11/2016.
@@ -222,5 +232,21 @@ public class MoviesProvider extends ContentProvider {
             default:
                 return super.bulkInsert(uri, values);
         }
+    }
+
+    public static boolean shouldCallAPI(Context mContext, String rowId){
+        Cursor movieCursor = mContext.getContentResolver().query(
+                MoviesContract.MovieEntry.CONTENT_URI,
+                MOVIES_COLUMNS,
+                mSelectionClause,
+                new String[]{rowId},
+                null);
+
+        return (!movieCursor.moveToFirst() ||
+                TextUtils.isEmpty(movieCursor.getString(COL_MOVIE_TITLE_SHORT)) ||
+                TextUtils.isEmpty(movieCursor.getString(COL_MOVIE_DESCRIPTION)) ||
+                TextUtils.isEmpty(movieCursor.getString(COL_MOVIE_VOTE_AVG)) ||
+                TextUtils.isEmpty(movieCursor.getString(COL_MOVIE_RELEASE_DATE)) ||
+                TextUtils.isEmpty(movieCursor.getString(COL_MOVIE_DURATION)));
     }
 }
