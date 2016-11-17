@@ -20,6 +20,9 @@ android {
     buildTypes.each {
         it.buildConfigField 'String', 'MOVIE_DB_API_KEY', MovieDbApiKey
     }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
